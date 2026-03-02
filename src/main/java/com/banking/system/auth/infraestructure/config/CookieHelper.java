@@ -30,7 +30,7 @@ public class CookieHelper {
                 .secure(secure)
                 .path(COOKIE_PATH)
                 .maxAge(MAX_AGE_SECONDS)
-                .sameSite("Lax")
+                .sameSite("lax")
                 .build();
     }
 
@@ -40,7 +40,7 @@ public class CookieHelper {
                 .secure(secure)
                 .path(COOKIE_PATH)
                 .maxAge(0)
-                .sameSite("Lax")
+                .sameSite("lax")
                 .build();
     }
 

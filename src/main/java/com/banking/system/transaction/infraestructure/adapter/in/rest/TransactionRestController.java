@@ -37,6 +37,7 @@ public class TransactionRestController {
     private final GetTransactionByIdUseCase getTransactionByIdUseCase;
     private final GetAllTransactionsByAccountUseCase getAllTransactionsByAccountUseCase;
     private final GetAllTransactionsByCustomerUseCase getAllTransactionsByCustomerUseCase;
+    private final GetTransactionByReferenceNumber getTransactionByReferenceNumber;
 
     @Operation(
             summary = "Create deposit",
@@ -149,6 +150,24 @@ public class TransactionRestController {
     public ResponseEntity<TransactionResult> getTransactionByIdForCustomer(@PathVariable @NotNull UUID transactionId,
                                                                            @AuthenticationPrincipal UUID userId) {
         var transactionResult = getTransactionByIdUseCase.getTransactionById(transactionId, userId);
+        return ResponseEntity.ok(transactionResult);
+    }
+
+    @Operation(
+            summary = "Get transaction by reference number",
+            description = "Retrieves the details of a specific transaction by its reference number. Only returns transactions where the authenticated user is the account owner."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Transaction details retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Invalid or expired JWT token"),
+            @ApiResponse(responseCode = "403", description = "Transaction does not belong to the authenticated user"),
+            @ApiResponse(responseCode = "404", description = "Transaction not found")
+    })
+    @PreAuthorize("hasAuthority('TRANSACTION_VIEW_OWN')")
+    @GetMapping("/reference/{referenceNumber}")
+    public ResponseEntity<TransactionResult> getTransactionByReferenceNumberForCustomer(@PathVariable @NotNull String referenceNumber,
+                                                                                        @AuthenticationPrincipal UUID userId) {
+        var transactionResult = getTransactionByReferenceNumber.getTransactionByReferenceNumber(referenceNumber, userId);
         return ResponseEntity.ok(transactionResult);
     }
 }

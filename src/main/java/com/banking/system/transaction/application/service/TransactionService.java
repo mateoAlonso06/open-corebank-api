@@ -48,7 +48,8 @@ public class TransactionService implements
         WithdrawUseCase,
         GetTransactionByIdUseCase,
         GetAllTransactionsByAccountUseCase,
-        GetAllTransactionsByCustomerUseCase {
+        GetAllTransactionsByCustomerUseCase,
+        GetTransactionByReferenceNumber {
     private final TransactionRepositoryPort transactionRepositoryPort;
     private final CustomerRepositoryPort customerRepositoryPort;
     private final AccountRepositoryPort accountRepositoryPort;
@@ -136,7 +137,7 @@ public class TransactionService implements
                 TransactionType.WITHDRAWAL,
                 withdrawAmount,
                 balanceAfter,
-                new Description("Withdrawal of " + withdrawAmount + " from account " + account.getAccountNumber()),
+                new Description("Withdrawal of " + withdrawAmount + " from account " + account.getAccountNumber().value()),
                 ReferenceNumber.generate(),
                 idempotencyKey
         );
@@ -172,6 +173,7 @@ public class TransactionService implements
         return PagedResult.mapContent(transactionsPage, TransactionDomainMapper::toResult);
     }
 
+
     @Override
     @Transactional(readOnly = true)
     public PagedResult<TransactionResult> getAllTransactionsByCustomer(UUID userId, PageRequest pageRequest) {
@@ -200,15 +202,22 @@ public class TransactionService implements
     public TransactionResult getTransactionById(UUID transactionId, UUID userId) {
         log.debug("initiating getTransactionById for transactionId: {} and userId: {}", transactionId, userId);
 
-        Customer customer = customerRepositoryPort.findByUserId(userId)
-                .orElseThrow(() -> new CustomerNotFoundException("Customer not found for userId: " + userId));
-
         Transaction transaction = transactionRepositoryPort.findById(transactionId)
                 .orElseThrow(() -> new TransactionNotFoundException("Transaction not found: " + transactionId));
 
-        if (!accountRepositoryPort.existsByCustomerId(customer.getId())) {
-            throw new AccountAccessDeniedException("Authenticated user does not have access to this transaction");
-        }
+        // Checks if the user has access to the account related to the transaction, if not, it will throw an exception
+        getAuthorizedAccount(transaction.getAccountId(), userId);
+
+        return TransactionDomainMapper.toResult(transaction);
+    }
+
+    @Override
+    public TransactionResult getTransactionByReferenceNumber(String referenceNumber, UUID userId) {
+        Transaction transaction = transactionRepositoryPort.findByReferenceNumber(referenceNumber)
+                .orElseThrow(() -> new TransactionNotFoundException("Transaction not found with reference number: " + referenceNumber));
+
+        // Checks if the user has access to the account related to the transaction, if not, it will throw an exception
+        getAuthorizedAccount(transaction.getAccountId(), userId);
 
         return TransactionDomainMapper.toResult(transaction);
     }

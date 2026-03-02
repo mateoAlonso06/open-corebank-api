@@ -148,7 +148,7 @@ public class AuthService implements
                 user.getEmail().value(),
                 role.getName(),
                 newAccessToken,
-                newRefreshToken.getToken(),
+                newRefreshToken.getToken(), // not serialized
                 null
         );
     }

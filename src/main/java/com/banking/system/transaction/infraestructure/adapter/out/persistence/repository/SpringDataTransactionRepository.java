@@ -19,6 +19,7 @@ import java.util.UUID;
 @Repository
 public interface SpringDataTransactionRepository extends JpaRepository<TransactionJpaEntity, UUID> {
     Page<TransactionJpaEntity> findAllByAccountId(UUID accountId, Pageable pageable);
+
     Optional<TransactionJpaEntity> findByIdempotencyKey(String idempotencyKey);
 
     Page<TransactionJpaEntity> findAllByAccountIdIn(List<UUID> accountIds, Pageable pageable);
@@ -32,4 +33,6 @@ public interface SpringDataTransactionRepository extends JpaRepository<Transacti
             @Param("accountId") UUID accountId,
             @Param("type") TransactionType type,
             @Param("since") Instant since);
+
+    Optional<TransactionJpaEntity> findByReferenceNumber(String referenceNumber);
 }

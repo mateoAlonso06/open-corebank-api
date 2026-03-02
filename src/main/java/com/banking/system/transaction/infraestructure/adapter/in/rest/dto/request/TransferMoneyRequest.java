@@ -43,6 +43,7 @@ public record TransferMoneyRequest(
 
         @Size(max = 255, message = "Description cannot exceed 255 characters")
         @SanitizeHtml
+        @NotBlank
         String description,
 
         @NotNull(message = "Idempotency key is required")

@@ -1,5 +1,6 @@
 package com.banking.system.auth.infraestructure.config;
 
+import jakarta.servlet.http.HttpServletResponse;
 import com.banking.system.auth.infraestructure.adapter.out.filter.CsrfTokenFilter;
 import com.banking.system.auth.infraestructure.adapter.out.filter.JwtAuthenticationFilter;
 import com.banking.system.auth.infraestructure.adapter.out.filter.RateLimitFilter;
@@ -90,7 +91,12 @@ public class SecurityConfig {
                     auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
                     auth.requestMatchers(SecurityConstants.PUBLIC_URLS).permitAll();
                     auth.anyRequest().authenticated();
-                });
+                })
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) ->
+                                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage())
+                        )
+                );
 
         // Add rate limit filter only if enabled
         rateLimitFilterProvider.ifAvailable(rateLimitFilter -> httpSecurity.addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class));

@@ -46,6 +46,13 @@ public class TransactionRepositoryAdapter implements TransactionRepositoryPort {
     }
 
     @Override
+    public Optional<Transaction> findByReferenceNumber(String referenceNumber) {
+        var transactionJpaEntity = transactionJpaRepository.findByReferenceNumber(referenceNumber);
+        return transactionJpaEntity
+                .map(TransactionJpaEntityMapper::toDomainEntity);
+    }
+
+    @Override
     public Optional<Transaction> findById(UUID transactionId) {
         var transactionJpaEntity = transactionJpaRepository.findById(transactionId);
         return transactionJpaEntity
