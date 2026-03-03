@@ -224,8 +224,10 @@ public class AuthService implements
             throw new InvalidCredentialsException("Old password is incorrect");
         }
 
-        Password hashedNewPassword = Password.fromHash(passwordHasher.hash(command.newPassword()));
-
+        // This verifies the new password strength and format, but does not hash it yet
+        Password newPassword = Password.fromPlainPassword(command.newPassword());
+        String hashedNewPasswordValue = passwordHasher.hash(newPassword.value());
+        Password hashedNewPassword = Password.fromHash(hashedNewPasswordValue);
         user.changePassword(hashedNewPassword);
         userRepository.save(user);
 

@@ -1,5 +1,7 @@
 package com.banking.system.auth.domain.model;
 
+import jakarta.validation.constraints.NotNull;
+
 import java.util.Objects;
 import java.util.regex.Pattern;
 

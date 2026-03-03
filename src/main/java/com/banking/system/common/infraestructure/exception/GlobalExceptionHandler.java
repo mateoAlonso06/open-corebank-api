@@ -2,11 +2,11 @@ package com.banking.system.common.infraestructure.exception;
 
 import com.banking.system.auth.domain.exception.UserIsLockedException;
 import com.banking.system.common.domain.exception.*;
-import org.springframework.dao.OptimisticLockingFailureException;
 import com.banking.system.notification.domain.exception.EmailRateLimitExceededException;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -21,7 +21,6 @@ import java.util.Map;
 
 /**
  * Global exception handler for the banking system.
- *
  * Security considerations:
  * - In production, internal exception messages are NEVER exposed to clients
  * - All responses include correlation ID for request tracking
@@ -146,7 +145,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Handles Spring Security access denied exceptions (@PreAuthorize, @Secured, etc).
+     * Handles Spring Security access denied exceptions (@PreAuthorize, @Secured, etc.).
      * Triggered when authenticated users lack required permissions/roles.
      * Logs: Full details for security auditing and privilege escalation attempts
      * Response: Generic message to prevent privilege escalation reconnaissance
@@ -253,7 +252,6 @@ public class GlobalExceptionHandler {
 
     /**
      * Catch-all handler for unexpected exceptions.
-     *
      * SECURITY CRITICAL: This handler MUST NOT expose internal error details in production.
      * Exposing ex.getMessage() can reveal:
      * - SQL table/column names (SQL injection reconnaissance)
@@ -261,7 +259,6 @@ public class GlobalExceptionHandler {
      * - Network topology (IPs, ports, hostnames)
      * - Technology stack details (version disclosure)
      * - Business logic internals
-     *
      * The full stack trace is logged server-side for debugging with correlation ID,
      * but clients only receive a generic message with the correlation ID for support.
      */
