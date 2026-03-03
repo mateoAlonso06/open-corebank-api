@@ -30,7 +30,7 @@ class CustomerRestControllerTestIT extends AbstractIntegrationTest {
     @Test
     void shouldReturnForbidden_whenRequestingOwnProfile_withoutAuthentication() throws Exception {
         mockMvc.perform(get("/api/v1/customers/me"))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
