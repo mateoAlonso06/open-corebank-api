@@ -1,6 +1,7 @@
 package com.banking.system.account.infraestructure.adapter.in.rest;
 
 import com.banking.system.account.application.dto.result.AccountBalanceResult;
+import com.banking.system.account.application.dto.result.AccountLimitResult;
 import com.banking.system.account.application.dto.result.AccountPublicResult;
 import com.banking.system.account.application.dto.result.AccountResult;
 import com.banking.system.account.application.usecase.CreateAccountUseCase;
@@ -8,6 +9,7 @@ import com.banking.system.account.application.usecase.FindAccountByIdUseCase;
 import com.banking.system.account.application.usecase.FindAllAccountsByUserId;
 import com.banking.system.account.application.usecase.GetAccountBalanceUseCase;
 import com.banking.system.account.application.usecase.SearchAccountByAliasUseCase;
+import com.banking.system.transaction.application.usecase.GetAccountLimitsUseCase;
 import com.banking.system.account.domain.model.AccountType;
 import com.banking.system.account.infraestructure.adapter.in.rest.dto.request.CreateAccountRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,6 +46,7 @@ public class  AccountRestController {
     private final FindAllAccountsByUserId findAllAccountsByUserId;
     private final GetAccountBalanceUseCase getAccountBalanceUseCase;
     private final SearchAccountByAliasUseCase searchAccountByAliasUseCase;
+    private final GetAccountLimitsUseCase getAccountLimitsUseCase;
 
     @Operation(
             summary = "Create a new bank account",
@@ -145,6 +148,27 @@ public class  AccountRestController {
             @PathVariable @NotNull UUID accountId,
             @Parameter(hidden = true) @AuthenticationPrincipal UUID userId) {
         var result = getAccountBalanceUseCase.getBalance(accountId, userId);
+        return ResponseEntity.ok().body(result);
+    }
+
+    @Operation(
+            summary = "Get account transaction limits",
+            description = "Retrieves the daily and monthly transaction limits and current usage for a specific account owned by the authenticated user."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Limits retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Invalid or expired JWT token"),
+            @ApiResponse(responseCode = "403", description = "Account does not belong to the authenticated user"),
+            @ApiResponse(responseCode = "404", description = "Account not found"),
+            @ApiResponse(responseCode = "422", description = "KYC not approved")
+    })
+    @PreAuthorize("hasAuthority('ACCOUNT_VIEW_OWN')")
+    @GetMapping("/me/{accountId}/limits")
+    public ResponseEntity<AccountLimitResult> getAccountLimits(
+            @Parameter(description = "Account ID", example = "550e8400-e29b-41d4-a716-446655440000")
+            @PathVariable @NotNull UUID accountId,
+            @Parameter(hidden = true) @AuthenticationPrincipal UUID userId) {
+        var result = getAccountLimitsUseCase.getAccountLimits(accountId, userId);
         return ResponseEntity.ok().body(result);
     }
 

@@ -1,5 +1,6 @@
 package com.banking.system.transaction.application.service;
 
+import com.banking.system.account.application.dto.result.AccountLimitResult;
 import com.banking.system.account.domain.exception.AccountNotFoundException;
 import com.banking.system.account.domain.model.Account;
 import com.banking.system.account.domain.model.AccountLimits;
@@ -29,6 +30,7 @@ import com.banking.system.transaction.domain.model.*;
 import com.banking.system.transaction.domain.port.out.TransactionRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,7 +51,8 @@ public class TransactionService implements
         GetTransactionByIdUseCase,
         GetAllTransactionsByAccountUseCase,
         GetAllTransactionsByCustomerUseCase,
-        GetTransactionByReferenceNumber {
+        GetTransactionByReferenceNumber,
+        GetAccountLimitsUseCase {
     private final TransactionRepositoryPort transactionRepositoryPort;
     private final CustomerRepositoryPort customerRepositoryPort;
     private final AccountRepositoryPort accountRepositoryPort;
@@ -196,6 +199,22 @@ public class TransactionService implements
         return PagedResult.mapContent(transactions, TransactionDomainMapper::toResult);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public AccountLimitResult getAccountLimits(UUID accountId, UUID userId) {
+        Account account = getAuthorizedAccount(accountId, userId);
+        AccountLimits limits = AccountLimits.forType(account.getAccountType());
+
+        Instant startOfDay = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant();
+        Instant startOfMonth = YearMonth.now().atDay(1).atStartOfDay(ZoneId.systemDefault()).toInstant();
+
+        BigDecimal depositToday = transactionRepositoryPort.sumCompletedAmountByAccountIdAndTypeSince(account.getId(), TransactionType.DEPOSIT, startOfDay);
+        BigDecimal depositMonth = transactionRepositoryPort.sumCompletedAmountByAccountIdAndTypeSince(account.getId(), TransactionType.DEPOSIT, startOfMonth);
+        BigDecimal withdrawalToday = transactionRepositoryPort.sumCompletedAmountByAccountIdAndTypeSince(account.getId(), TransactionType.WITHDRAWAL, startOfDay);
+        BigDecimal withdrawalMonth = transactionRepositoryPort.sumCompletedAmountByAccountIdAndTypeSince(account.getId(), TransactionType.WITHDRAWAL, startOfMonth);
+
+        return AccountLimitResult.of(account, limits, depositToday, depositMonth, withdrawalToday, withdrawalMonth);
+    }
 
     @Override
     @Transactional(readOnly = true)
@@ -223,7 +242,7 @@ public class TransactionService implements
     }
 
     /*Gets the account if the user is authorized and KYC is approved*/
-    private Account getAuthorizedAccount(UUID accountId, UUID userId) {
+    private @NonNull Account getAuthorizedAccount(UUID accountId, UUID userId) {
         Customer customer = customerRepositoryPort.findByUserId(userId)
                 .orElseThrow(() -> new CustomerNotFoundException("Customer not found for userId: " + userId));
 
