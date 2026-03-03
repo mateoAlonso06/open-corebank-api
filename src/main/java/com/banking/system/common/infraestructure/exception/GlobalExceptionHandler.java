@@ -2,6 +2,7 @@ package com.banking.system.common.infraestructure.exception;
 
 import com.banking.system.auth.domain.exception.UserIsLockedException;
 import com.banking.system.common.domain.exception.*;
+import org.springframework.dao.OptimisticLockingFailureException;
 import com.banking.system.notification.domain.exception.EmailRateLimitExceededException;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -81,6 +82,24 @@ public class GlobalExceptionHandler {
 
         String message = sanitizeMessage(ex.getMessage(), MSG_RESOURCE_NOT_FOUND);
         return buildResponse(HttpStatus.NOT_FOUND, "Not Found", message, ex.getErrorCode());
+    }
+
+    /**
+     * Handles optimistic locking failures caused by concurrent account modifications.
+     * Occurs when two simultaneous operations (deposit, withdrawal) modify the same account.
+     * The first operation wins; the second receives a 409 so the client can retry.
+     * Logs: Full details to detect abnormal concurrency patterns.
+     */
+    @ExceptionHandler(OptimisticLockingFailureException.class)
+    public ResponseEntity<Map<String, Object>> handleOptimisticLocking(OptimisticLockingFailureException ex) {
+        log.warn("Concurrent account modification detected [correlationId={}]: {}",
+                MDC.get("correlationId"), ex.getMessage());
+
+        String message = sanitizeMessage(
+                "The account was modified by another operation. Please retry.",
+                MSG_RESOURCE_CONFLICT
+        );
+        return buildResponse(HttpStatus.CONFLICT, "Conflict", message, "CONCURRENT_MODIFICATION");
     }
 
     /**

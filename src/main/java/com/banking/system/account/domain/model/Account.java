@@ -29,6 +29,7 @@ public class Account {
     private AccountStatus status;
     private LocalDate closedAt;
     private Instant updatedAt;
+    private Long version;
 
     private Account(
             UUID id,
@@ -44,7 +45,8 @@ public class Account {
             Money monthlyTransferLimit,
             LocalDate openedAt,
             LocalDate closedAt,
-            Instant updatedAt) {
+            Instant updatedAt,
+            Long version) {
         Objects.requireNonNull(customerId, "Customer ID cannot be null");
         Objects.requireNonNull(accountNumber, "Account number cannot be null");
         Objects.requireNonNull(accountType, "Account type cannot be null");
@@ -70,6 +72,7 @@ public class Account {
         this.openedAt = openedAt;
         this.closedAt = closedAt;
         this.updatedAt = updatedAt;
+        this.version = version;
     }
 
 
@@ -128,7 +131,8 @@ public class Account {
             Money monthlyTransferLimit,
             LocalDate openedAt,
             LocalDate closedAt,
-            Instant updatedAt) {
+            Instant updatedAt,
+            Long version) {
 
         return new Account(
                 id,
@@ -144,7 +148,8 @@ public class Account {
                 monthlyTransferLimit,
                 openedAt,
                 closedAt,
-                updatedAt
+                updatedAt,
+                version
         );
     }
 
@@ -185,7 +190,8 @@ public class Account {
                 Money.of(limits.monthlyTransferLimit(), currency),
                 LocalDate.now(),
                 null,
-                Instant.now()
+                Instant.now(),
+                0L
         );
     }
 

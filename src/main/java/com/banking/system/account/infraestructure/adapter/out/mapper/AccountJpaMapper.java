@@ -23,6 +23,7 @@ public class AccountJpaMapper {
                 .dailyTransferLimit(account.getDailyTransferLimit().getValue())
                 .monthlyTransferLimit(account.getMonthlyTransferLimit().getValue())
                 .openedAt(account.getOpenedAt())
+                .version(account.getVersion())
                 .build();
     }
 
@@ -44,7 +45,8 @@ public class AccountJpaMapper {
                 Money.of(accountJpaEntity.getMonthlyTransferLimit(), currency),
                 accountJpaEntity.getOpenedAt(),
                 accountJpaEntity.getClosedAt(),
-                accountJpaEntity.getUpdatedAt()
+                accountJpaEntity.getUpdatedAt(),
+                accountJpaEntity.getVersion()
         );
     }
 }
