@@ -1,5 +1,6 @@
 package com.banking.system.common.infraestructure.exception;
 
+import com.banking.system.auth.domain.exception.PasswordValidationException;
 import com.banking.system.auth.domain.exception.UserIsLockedException;
 import com.banking.system.common.domain.exception.*;
 import com.banking.system.notification.domain.exception.EmailRateLimitExceededException;
@@ -220,6 +221,18 @@ public class GlobalExceptionHandler {
         // In dev: show full details for easier debugging
         String message = String.join("; ", detailedErrors);
         return buildResponse(HttpStatus.BAD_REQUEST, "Bad Request", message, "VALIDATION_FAILED");
+    }
+
+    /**
+     * Handles password validation failures.
+     * The validation message is always exposed — password rules are not sensitive information,
+     * and the user needs to know exactly what to fix.
+     */
+    @ExceptionHandler(PasswordValidationException.class)
+    public ResponseEntity<Map<String, Object>> handlePasswordValidation(PasswordValidationException ex) {
+        log.warn("Password validation failed [correlationId={}]: {}", MDC.get("correlationId"), ex.getMessage());
+
+        return buildResponse(HttpStatus.BAD_REQUEST, "Bad Request", ex.getMessage(), ex.getErrorCode());
     }
 
     /**

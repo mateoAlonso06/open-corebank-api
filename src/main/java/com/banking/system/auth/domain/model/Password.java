@@ -1,6 +1,6 @@
 package com.banking.system.auth.domain.model;
 
-import jakarta.validation.constraints.NotNull;
+import com.banking.system.auth.domain.exception.PasswordValidationException;
 
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -37,10 +37,10 @@ public record Password(String plainPassword, String hashedPassword) {
     public Password {
         // Must have exactly one: plain OR hashed (not both, not neither)
         if (plainPassword == null && hashedPassword == null) {
-            throw new IllegalArgumentException("Password must have either plain or hashed value");
+            throw new PasswordValidationException("Password must have either plain or hashed value");
         }
         if (plainPassword != null && hashedPassword != null) {
-            throw new IllegalArgumentException("Password cannot have both plain and hashed values simultaneously");
+            throw new PasswordValidationException("Password cannot have both plain and hashed values simultaneously");
         }
 
         // Validate plain password strength if present
@@ -50,7 +50,7 @@ public record Password(String plainPassword, String hashedPassword) {
 
         // Validate hashed password is not blank if present
         if (hashedPassword != null && hashedPassword.isBlank()) {
-            throw new IllegalArgumentException("Hashed password cannot be blank");
+            throw new PasswordValidationException("Hashed password cannot be blank");
         }
     }
 
@@ -84,35 +84,35 @@ public record Password(String plainPassword, String hashedPassword) {
         Objects.requireNonNull(password, "Password cannot be null");
 
         if (password.length() < MIN_LENGTH) {
-            throw new IllegalArgumentException(
+            throw new PasswordValidationException(
                     "Password must be at least " + MIN_LENGTH + " characters long"
             );
         }
 
         if (password.length() > MAX_LENGTH) {
-            throw new IllegalArgumentException(
+            throw new PasswordValidationException(
                     "Password cannot exceed " + MAX_LENGTH + " characters"
             );
         }
 
         if (WHITESPACE_PATTERN.matcher(password).matches()) {
-            throw new IllegalArgumentException("Password cannot contain whitespace");
+            throw new PasswordValidationException("Password cannot contain whitespace");
         }
 
         if (!UPPERCASE_PATTERN.matcher(password).matches()) {
-            throw new IllegalArgumentException("Password must contain at least one uppercase letter");
+            throw new PasswordValidationException("Password must contain at least one uppercase letter");
         }
 
         if (!LOWERCASE_PATTERN.matcher(password).matches()) {
-            throw new IllegalArgumentException("Password must contain at least one lowercase letter");
+            throw new PasswordValidationException("Password must contain at least one lowercase letter");
         }
 
         if (!DIGIT_PATTERN.matcher(password).matches()) {
-            throw new IllegalArgumentException("Password must contain at least one digit");
+            throw new PasswordValidationException("Password must contain at least one digit");
         }
 
         if (!SPECIAL_CHAR_PATTERN.matcher(password).matches()) {
-            throw new IllegalArgumentException("Password must contain at least one special character (!@#$%^&*()_+-=[]{}|;':\"\\,.<>/?)");
+            throw new PasswordValidationException("Password must contain at least one special character (!@#$%^&*()_+-=[]{}|;':\"\\,.<>/?)");
         }
     }
 
