@@ -1,7 +1,7 @@
 package com.banking.system.transaction.infraestructure.adapter.out.persistence.entity;
 
-import com.banking.system.transaction.domain.model.TransactionStatus;
-import com.banking.system.transaction.domain.model.TransactionType;
+import com.banking.system.transaction.domain.model.enums.TransactionStatus;
+import com.banking.system.transaction.domain.model.enums.TransactionType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;

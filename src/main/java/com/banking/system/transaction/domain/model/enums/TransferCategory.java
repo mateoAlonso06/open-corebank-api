@@ -1,4 +1,4 @@
-package com.banking.system.transaction.domain.model;
+package com.banking.system.transaction.domain.model.enums;
 
 public enum TransferCategory {
     FOOD,

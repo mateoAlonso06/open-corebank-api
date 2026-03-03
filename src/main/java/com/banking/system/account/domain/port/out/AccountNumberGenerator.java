@@ -1,7 +1,7 @@
 package com.banking.system.account.domain.port.out;
 
-import com.banking.system.account.domain.model.AccountNumber;
-import com.banking.system.account.domain.model.AccountType;
+import com.banking.system.account.domain.model.value_object.AccountNumber;
+import com.banking.system.account.domain.model.enums.AccountType;
 
 /**
  * Port for generating unique account numbers.

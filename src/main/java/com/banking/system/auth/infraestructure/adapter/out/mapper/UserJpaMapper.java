@@ -1,7 +1,7 @@
 package com.banking.system.auth.infraestructure.adapter.out.mapper;
 
-import com.banking.system.auth.domain.model.Email;
-import com.banking.system.auth.domain.model.Password;
+import com.banking.system.auth.domain.model.value_object.Email;
+import com.banking.system.auth.domain.model.value_object.Password;
 import com.banking.system.auth.domain.model.Role;
 import com.banking.system.auth.domain.model.User;
 import com.banking.system.auth.infraestructure.adapter.out.persistence.entity.RoleJpaEntity;

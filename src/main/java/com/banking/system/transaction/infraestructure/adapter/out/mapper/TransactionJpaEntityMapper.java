@@ -2,9 +2,9 @@ package com.banking.system.transaction.infraestructure.adapter.out.mapper;
 
 import com.banking.system.common.domain.Money;
 import com.banking.system.common.domain.MoneyCurrency;
-import com.banking.system.transaction.domain.model.Description;
-import com.banking.system.transaction.domain.model.IdempotencyKey;
-import com.banking.system.transaction.domain.model.ReferenceNumber;
+import com.banking.system.transaction.domain.model.value_object.Description;
+import com.banking.system.transaction.domain.model.value_object.IdempotencyKey;
+import com.banking.system.transaction.domain.model.value_object.ReferenceNumber;
 import com.banking.system.transaction.domain.model.Transaction;
 import com.banking.system.transaction.infraestructure.adapter.out.persistence.entity.TransactionJpaEntity;
 

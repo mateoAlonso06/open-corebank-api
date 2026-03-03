@@ -1,7 +1,7 @@
 package com.banking.system.auth.infraestructure.adapter.out.cache;
 
 import com.banking.system.auth.domain.model.Role;
-import com.banking.system.auth.domain.model.RoleName;
+import com.banking.system.auth.domain.model.enums.RoleName;
 import com.banking.system.auth.domain.port.out.RolePermissionCachePort;
 import com.banking.system.auth.domain.port.out.RoleRepositoryPort;
 import com.banking.system.auth.infraestructure.config.CacheConfig;

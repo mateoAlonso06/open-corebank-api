@@ -1,4 +1,4 @@
-package com.banking.system.account.domain.model;
+package com.banking.system.account.domain.model.enums;
 
 public enum AccountType {
     SAVINGS,

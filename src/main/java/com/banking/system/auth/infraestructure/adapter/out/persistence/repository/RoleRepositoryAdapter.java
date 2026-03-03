@@ -1,7 +1,7 @@
 package com.banking.system.auth.infraestructure.adapter.out.persistence.repository;
 
 import com.banking.system.auth.domain.model.Role;
-import com.banking.system.auth.domain.model.RoleName;
+import com.banking.system.auth.domain.model.enums.RoleName;
 import com.banking.system.auth.domain.port.out.RoleRepositoryPort;
 import com.banking.system.auth.infraestructure.adapter.out.mapper.RoleJpaMapper;
 import lombok.RequiredArgsConstructor;

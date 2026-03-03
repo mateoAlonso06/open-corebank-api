@@ -1,6 +1,6 @@
 package com.banking.system.account.infraestructure.adapter.out.generator;
 
-import com.banking.system.account.domain.model.AccountAlias;
+import com.banking.system.account.domain.model.value_object.AccountAlias;
 import com.banking.system.account.domain.port.out.AccountAliasGenerator;
 import org.springframework.stereotype.Component;
 

@@ -44,6 +44,7 @@ public class AuthRestController {
     private final GetTwoFactorStatusUseCase getTwoFactorStatusUseCase;
     private final RefreshTokenUseCase refreshTokenUseCase;
     private final LogoutUseCase logoutUseCase;
+    private final DeactivateAccountUseCase deactivateAccountUseCase;
     private final CookieHelper cookieHelper;
 
     @Operation(
@@ -71,6 +72,7 @@ public class AuthRestController {
             @ApiResponse(responseCode = "200", description = "Login successful, JWT token returned"),
             @ApiResponse(responseCode = "400", description = "Invalid request data (validation failed)"),
             @ApiResponse(responseCode = "401", description = "Invalid credentials"),
+            @ApiResponse(responseCode = "403", description = "Account has been deactivated"),
             @ApiResponse(responseCode = "404", description = "User not found"),
             @ApiResponse(responseCode = "423", description = "User is blocked"),
     })
@@ -229,6 +231,31 @@ public class AuthRestController {
         cookieHelper.extractRefreshToken(request)
                 .ifPresent(logoutUseCase::logout);
 
+        return ResponseEntity.noContent()
+                .header(HttpHeaders.SET_COOKIE, cookieHelper.clearRefreshTokenCookie().toString())
+                .header(HttpHeaders.SET_COOKIE, cookieHelper.clearCsrfTokenCookie().toString())
+                .build();
+    }
+
+    @Operation(
+            summary = "Deactivate account",
+            description = "Permanently deactivates the authenticated user's account. " +
+                    "Requires password confirmation. Sessions are revoked immediately. " +
+                    "This action is irreversible — contact support to reactivate."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Account deactivated successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request data (validation failed)"),
+            @ApiResponse(responseCode = "401", description = "Invalid or expired JWT token, or incorrect password"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PreAuthorize("isAuthenticated()")
+    @DeleteMapping("/account")
+    public ResponseEntity<Void> deactivateAccount(
+            @Parameter(hidden = true) @AuthenticationPrincipal UUID userId,
+            @RequestBody @Valid DeactivateAccountRequest request) {
+        deactivateAccountUseCase.deactivateAccount(userId, request.password());
         return ResponseEntity.noContent()
                 .header(HttpHeaders.SET_COOKIE, cookieHelper.clearRefreshTokenCookie().toString())
                 .header(HttpHeaders.SET_COOKIE, cookieHelper.clearCsrfTokenCookie().toString())

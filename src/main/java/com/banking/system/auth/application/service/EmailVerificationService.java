@@ -7,9 +7,8 @@ import com.banking.system.auth.application.usecase.ResendVerificationEmailUseCas
 import com.banking.system.auth.application.usecase.VerifyEmailUseCase;
 import com.banking.system.auth.domain.exception.InvalidVerificationTokenException;
 import com.banking.system.auth.domain.exception.UserIsAlreadyProcessedException;
-import com.banking.system.auth.domain.exception.UserNotVerifiedException;
 import com.banking.system.auth.domain.model.User;
-import com.banking.system.auth.domain.model.UserStatus;
+import com.banking.system.auth.domain.model.enums.UserStatus;
 import com.banking.system.auth.domain.model.VerificationToken;
 import com.banking.system.auth.domain.port.out.UserRepositoryPort;
 import com.banking.system.auth.domain.port.out.VerificationTokenRepositoryPort;

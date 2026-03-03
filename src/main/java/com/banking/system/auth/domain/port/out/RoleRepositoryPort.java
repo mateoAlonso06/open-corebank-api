@@ -1,7 +1,7 @@
 package com.banking.system.auth.domain.port.out;
 
 import com.banking.system.auth.domain.model.Role;
-import com.banking.system.auth.domain.model.RoleName;
+import com.banking.system.auth.domain.model.enums.RoleName;
 
 import java.util.Optional;
 import java.util.UUID;

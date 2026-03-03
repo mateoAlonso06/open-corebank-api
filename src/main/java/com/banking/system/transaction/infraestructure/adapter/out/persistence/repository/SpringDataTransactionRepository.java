@@ -1,7 +1,7 @@
 package com.banking.system.transaction.infraestructure.adapter.out.persistence.repository;
 
-import com.banking.system.transaction.domain.model.TransactionStatus;
-import com.banking.system.transaction.domain.model.TransactionType;
+import com.banking.system.transaction.domain.model.enums.TransactionStatus;
+import com.banking.system.transaction.domain.model.enums.TransactionType;
 import com.banking.system.transaction.infraestructure.adapter.out.persistence.entity.TransactionJpaEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

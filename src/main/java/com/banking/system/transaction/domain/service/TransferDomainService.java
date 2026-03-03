@@ -4,6 +4,12 @@ import com.banking.system.account.domain.model.Account;
 import com.banking.system.common.domain.Money;
 import com.banking.system.transaction.domain.exception.SameAccountTransferException;
 import com.banking.system.transaction.domain.model.*;
+import com.banking.system.transaction.domain.model.enums.TransactionType;
+import com.banking.system.transaction.domain.model.enums.TransferCategory;
+import com.banking.system.transaction.domain.model.value_object.Description;
+import com.banking.system.transaction.domain.model.value_object.IdempotencyKey;
+import com.banking.system.transaction.domain.model.value_object.ReferenceNumber;
+import com.banking.system.transaction.domain.model.value_object.TransferExecution;
 import org.springframework.stereotype.Component;
 
 @Component

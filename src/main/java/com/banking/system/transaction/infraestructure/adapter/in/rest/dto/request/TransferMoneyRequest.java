@@ -2,7 +2,7 @@ package com.banking.system.transaction.infraestructure.adapter.in.rest.dto.reque
 
 import com.banking.system.common.infraestructure.utils.SanitizeHtml;
 import com.banking.system.transaction.application.dto.command.TransferMoneyCommand;
-import com.banking.system.transaction.domain.model.TransferCategory;
+import com.banking.system.transaction.domain.model.enums.TransferCategory;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;

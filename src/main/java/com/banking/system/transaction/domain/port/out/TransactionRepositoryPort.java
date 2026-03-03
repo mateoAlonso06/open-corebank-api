@@ -3,8 +3,8 @@ package com.banking.system.transaction.domain.port.out;
 import com.banking.system.common.domain.PageRequest;
 import com.banking.system.common.domain.dto.PagedResult;
 import com.banking.system.transaction.domain.model.Transaction;
-import com.banking.system.transaction.domain.model.TransactionStatus;
-import com.banking.system.transaction.domain.model.TransactionType;
+import com.banking.system.transaction.domain.model.enums.TransactionStatus;
+import com.banking.system.transaction.domain.model.enums.TransactionType;
 
 import java.math.BigDecimal;
 import java.time.Instant;

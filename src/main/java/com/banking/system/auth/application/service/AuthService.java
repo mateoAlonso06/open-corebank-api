@@ -12,6 +12,9 @@ import com.banking.system.auth.application.usecase.*;
 import com.banking.system.auth.domain.exception.*;
 import com.banking.system.auth.domain.model.*;
 import com.banking.system.auth.application.port.out.LoginTrackingPort;
+import com.banking.system.auth.domain.model.enums.UserStatus;
+import com.banking.system.auth.domain.model.value_object.Email;
+import com.banking.system.auth.domain.model.value_object.Password;
 import com.banking.system.auth.domain.port.out.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
@@ -29,7 +32,8 @@ public class AuthService implements
         FindUserByIdUseCase,
         ChangePasswordUseCase,
         RefreshTokenUseCase,
-        LogoutUseCase {
+        LogoutUseCase,
+        DeactivateAccountUseCase {
 
     private final UserRepositoryPort userRepository;
     private final RoleRepositoryPort roleRepository;
@@ -71,6 +75,9 @@ public class AuthService implements
         // for security verify password is the first check
         if (!passwordHasher.verify(command.password(), user.getPassword().value()))
             throw new InvalidCredentialsException("Invalid credentials");
+
+        if (user.getStatus() == UserStatus.DEACTIVATED)
+            throw new AccountDeactivatedException("Your account has been deactivated. Please contact support to reactivate it.");
 
         if (user.getStatus() == UserStatus.BLOCKED)
             throw new UserIsLockedException("User account is blocked");
@@ -232,5 +239,26 @@ public class AuthService implements
         userRepository.save(user);
 
         log.info("Password changed successfully for user with ID: {}", userId);
+    }
+
+    @Override
+    @Transactional
+    public void deactivateAccount(UUID userId, String password) {
+        log.info("Deactivating account for user with ID: {}", userId);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        if (!passwordHasher.verify(password, user.getPassword().value()))
+            throw new InvalidCredentialsException("Password is incorrect");
+
+        user.deactivate();
+
+        this.userEventPublisher.publishCloseAllAccountsRequestEvent(user.getId());
+
+        refreshTokenRepository.revokeAllByUserId(userId);
+        userRepository.save(user);
+
+        log.info("Account deactivated for user with ID: {}", userId);
     }
 }

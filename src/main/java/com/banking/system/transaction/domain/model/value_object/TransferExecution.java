@@ -1,4 +1,7 @@
-package com.banking.system.transaction.domain.model;
+package com.banking.system.transaction.domain.model.value_object;
+
+import com.banking.system.transaction.domain.model.Transaction;
+import com.banking.system.transaction.domain.model.Transfer;
 
 /**
  * Represents the result of executing a transfer in the domain layer.

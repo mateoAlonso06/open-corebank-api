@@ -1,9 +1,10 @@
 package com.banking.system.transaction.application.service;
 
 import com.banking.system.account.application.dto.result.AccountLimitResult;
+import com.banking.system.account.domain.exception.AccountNotActiveException;
 import com.banking.system.account.domain.exception.AccountNotFoundException;
 import com.banking.system.account.domain.model.Account;
-import com.banking.system.account.domain.model.AccountLimits;
+import com.banking.system.account.domain.model.value_object.AccountLimits;
 import com.banking.system.account.domain.port.out.AccountRepositoryPort;
 import com.banking.system.common.domain.Money;
 import com.banking.system.common.domain.MoneyCurrency;
@@ -27,6 +28,11 @@ import com.banking.system.transaction.domain.exception.alreadyexist.TransactionA
 import com.banking.system.transaction.domain.exception.denied.AccountAccessDeniedException;
 import com.banking.system.transaction.domain.exception.notfound.TransactionNotFoundException;
 import com.banking.system.transaction.domain.model.*;
+import com.banking.system.transaction.domain.model.enums.TransactionStatus;
+import com.banking.system.transaction.domain.model.enums.TransactionType;
+import com.banking.system.transaction.domain.model.value_object.Description;
+import com.banking.system.transaction.domain.model.value_object.IdempotencyKey;
+import com.banking.system.transaction.domain.model.value_object.ReferenceNumber;
 import com.banking.system.transaction.domain.port.out.TransactionRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

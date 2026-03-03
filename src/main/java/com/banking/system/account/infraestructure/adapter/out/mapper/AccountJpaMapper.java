@@ -1,8 +1,8 @@
 package com.banking.system.account.infraestructure.adapter.out.mapper;
 
 import com.banking.system.account.domain.model.Account;
-import com.banking.system.account.domain.model.AccountAlias;
-import com.banking.system.account.domain.model.AccountNumber;
+import com.banking.system.account.domain.model.value_object.AccountAlias;
+import com.banking.system.account.domain.model.value_object.AccountNumber;
 import com.banking.system.common.domain.Money;
 import com.banking.system.common.domain.MoneyCurrency;
 import com.banking.system.account.infraestructure.adapter.out.persistence.entity.AccountJpaEntity;

@@ -1,7 +1,7 @@
 package com.banking.system.account.domain.port.out;
 
 import com.banking.system.account.domain.model.Account;
-import com.banking.system.account.domain.model.AccountType;
+import com.banking.system.account.domain.model.enums.AccountType;
 
 import java.util.List;
 import java.util.Optional;

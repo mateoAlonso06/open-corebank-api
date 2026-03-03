@@ -1,6 +1,9 @@
 package com.banking.system.auth.domain.model;
 
 import com.banking.system.auth.domain.exception.UserIsAlreadyProcessedException;
+import com.banking.system.auth.domain.model.enums.UserStatus;
+import com.banking.system.auth.domain.model.value_object.Email;
+import com.banking.system.auth.domain.model.value_object.Password;
 import lombok.*;
 
 import java.util.Objects;
@@ -101,6 +104,20 @@ public class User {
             throw new UserIsAlreadyProcessedException("Only ACTIVE users can be blocked");
 
         this.status = UserStatus.BLOCKED;
+    }
+
+    public void unblock() {
+        if (this.status != UserStatus.BLOCKED)
+            throw new UserIsAlreadyProcessedException("Only BLOCKED users can be unblocked");
+
+        this.status = UserStatus.ACTIVE;
+    }
+
+    public void deactivate() {
+        if (this.status != UserStatus.ACTIVE)
+            throw new UserIsAlreadyProcessedException("Only ACTIVE users can deactivate their account");
+
+        this.status = UserStatus.DEACTIVATED;
     }
 
     public void enableTwoFactor() {

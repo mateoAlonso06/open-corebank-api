@@ -1,4 +1,4 @@
-package com.banking.system.transaction.domain.model;
+package com.banking.system.transaction.domain.model.value_object;
 
 import java.security.SecureRandom;
 import java.time.Instant;

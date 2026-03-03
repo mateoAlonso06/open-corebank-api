@@ -1,7 +1,7 @@
 package com.banking.system.account.infraestructure.adapter.out.persistence.repository;
 
 import com.banking.system.account.domain.model.Account;
-import com.banking.system.account.domain.model.AccountType;
+import com.banking.system.account.domain.model.enums.AccountType;
 import com.banking.system.account.domain.port.out.AccountRepositoryPort;
 import com.banking.system.account.infraestructure.adapter.out.mapper.AccountJpaMapper;
 import lombok.RequiredArgsConstructor;

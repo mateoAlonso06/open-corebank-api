@@ -1,4 +1,4 @@
-package com.banking.system.account.domain.model;
+package com.banking.system.account.domain.model.value_object;
 
 import java.util.regex.Pattern;
 

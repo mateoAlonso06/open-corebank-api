@@ -1,7 +1,7 @@
 package com.banking.system.account.infraestructure.adapter.out.persistence.entity;
 
-import com.banking.system.account.domain.model.AccountStatus;
-import com.banking.system.account.domain.model.AccountType;
+import com.banking.system.account.domain.model.enums.AccountStatus;
+import com.banking.system.account.domain.model.enums.AccountType;
 import jakarta.persistence.*;
 import lombok.*;
 

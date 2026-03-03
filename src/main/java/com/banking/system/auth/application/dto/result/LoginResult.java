@@ -1,6 +1,6 @@
 package com.banking.system.auth.application.dto.result;
 
-import com.banking.system.auth.domain.model.RoleName;
+import com.banking.system.auth.domain.model.enums.RoleName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.Instant;

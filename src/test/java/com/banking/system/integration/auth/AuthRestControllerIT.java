@@ -1,6 +1,6 @@
 package com.banking.system.integration.auth;
 
-import com.banking.system.auth.domain.model.UserStatus;
+import com.banking.system.auth.domain.model.enums.UserStatus;
 import com.banking.system.auth.infraestructure.adapter.out.persistence.entity.VerificationTokenJpaEntity;
 import com.banking.system.auth.infraestructure.adapter.out.persistence.repository.SpringDataUserRepository;
 import com.banking.system.auth.infraestructure.adapter.out.persistence.repository.SpringVerificationTokenJpaRepository;

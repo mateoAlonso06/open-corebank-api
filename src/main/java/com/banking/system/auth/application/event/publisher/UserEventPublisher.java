@@ -12,4 +12,6 @@ public interface UserEventPublisher {
     void publishEmailVerificationRequestedEvent(UUID userId, String email, String token, String firstName);
 
     void publishTwoFactorCodeRequestedEvent(UUID userId, String email, String code, String firstName);
+
+    void publishCloseAllAccountsRequestEvent(UUID userId);
 }

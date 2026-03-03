@@ -1,5 +1,6 @@
 package com.banking.system.auth.domain.model;
 
+import com.banking.system.auth.domain.model.enums.RoleName;
 import lombok.Getter;
 
 import java.util.Collections;

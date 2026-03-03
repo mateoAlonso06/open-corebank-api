@@ -10,7 +10,7 @@ import com.banking.system.account.application.usecase.FindAllAccountsByUserId;
 import com.banking.system.account.application.usecase.GetAccountBalanceUseCase;
 import com.banking.system.account.application.usecase.SearchAccountByAliasUseCase;
 import com.banking.system.transaction.application.usecase.GetAccountLimitsUseCase;
-import com.banking.system.account.domain.model.AccountType;
+import com.banking.system.account.domain.model.enums.AccountType;
 import com.banking.system.account.infraestructure.adapter.in.rest.dto.request.CreateAccountRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

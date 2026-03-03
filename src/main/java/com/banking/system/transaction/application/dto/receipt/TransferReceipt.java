@@ -1,6 +1,6 @@
 package com.banking.system.transaction.application.dto.receipt;
 
-import com.banking.system.transaction.domain.model.TransferCategory;
+import com.banking.system.transaction.domain.model.enums.TransferCategory;
 
 import java.math.BigDecimal;
 import java.time.Instant;

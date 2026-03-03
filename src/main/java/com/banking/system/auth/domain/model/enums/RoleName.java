@@ -1,4 +1,4 @@
-package com.banking.system.auth.domain.model;
+package com.banking.system.auth.domain.model.enums;
 
 /**
  * Enumeration of available role names in the system.

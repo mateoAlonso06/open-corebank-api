@@ -1,5 +1,6 @@
 package com.banking.system.common.infraestructure.exception;
 
+import com.banking.system.auth.domain.exception.AccountDeactivatedException;
 import com.banking.system.auth.domain.exception.PasswordValidationException;
 import com.banking.system.auth.domain.exception.UserIsLockedException;
 import com.banking.system.common.domain.exception.*;
@@ -44,6 +45,7 @@ public class GlobalExceptionHandler {
     private static final String MSG_INVALID_STATE = "Operation not allowed in current state";
     private static final String MSG_INTERNAL_ERROR = "An unexpected error occurred. Please contact support with the correlation ID";
     private static final String MSG_ACCOUNT_LOCKED = "Account is temporarily locked";
+    private static final String MSG_ACCOUNT_DEACTIVATED = "Account has been deactivated. Please contact support.";
     private static final String MSG_RATE_LIMIT_EXCEEDED = "Too many requests. Please try again later";
 
     @Value("${spring.profiles.active:dev}")
@@ -163,15 +165,18 @@ public class GlobalExceptionHandler {
 
     /**
      * Handles business rule violations.
-     * Logs: Full details for business analysis
-     * Response: Generic message in production to hide business logic details
+     * Logs: Full details including any sensitive internal data (account IDs, amounts, etc.)
+     * Response: Uses the exception's clientMessage in production (set by the domain layer),
+     *           falling back to the generic message if not provided.
+     *           This allows domain exceptions to control what is safe to expose to clients
+     *           without leaking internal details (e.g. exact amounts, account IDs).
      */
     @ExceptionHandler(BusinessRuleException.class)
     public ResponseEntity<Map<String, Object>> handleBusinessRule(BusinessRuleException ex) {
         log.warn("Business rule violation [correlationId={}]: {}",
                 MDC.get("correlationId"), ex.getMessage());
 
-        String message = sanitizeMessage(ex.getMessage(), MSG_BUSINESS_RULE);
+        String message = sanitizeMessage(ex.getMessage(), ex.getClientMessage() != null ? ex.getClientMessage() : MSG_BUSINESS_RULE);
         return buildResponse(HttpStatus.UNPROCESSABLE_ENTITY, "Unprocessable Entity", message, ex.getErrorCode());
     }
 
@@ -283,6 +288,20 @@ public class GlobalExceptionHandler {
         // NEVER expose internal exception messages in production
         String message = sanitizeMessage(ex.getMessage(), MSG_INTERNAL_ERROR);
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", message, "INTERNAL_ERROR");
+    }
+
+    /**
+     * Handles permanently deactivated account exceptions.
+     * Returns HTTP 403 Forbidden — the account is permanently deactivated, not temporarily locked.
+     * The user must contact support to reactivate.
+     */
+    @ExceptionHandler(AccountDeactivatedException.class)
+    public ResponseEntity<Map<String, Object>> handleAccountDeactivated(AccountDeactivatedException ex) {
+        log.warn("Deactivated account login attempt [correlationId={}]: {}",
+                MDC.get("correlationId"), ex.getMessage());
+
+        String message = sanitizeMessage(ex.getMessage(), MSG_ACCOUNT_DEACTIVATED);
+        return buildResponse(HttpStatus.FORBIDDEN, "Forbidden", message, ex.getErrorCode());
     }
 
     /**

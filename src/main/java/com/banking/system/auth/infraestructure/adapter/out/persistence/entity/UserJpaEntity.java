@@ -1,6 +1,6 @@
 package com.banking.system.auth.infraestructure.adapter.out.persistence.entity;
 
-import com.banking.system.auth.domain.model.UserStatus;
+import com.banking.system.auth.domain.model.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -8,11 +8,12 @@ import com.banking.system.account.application.event.AccountCreatedEvent;
 import com.banking.system.account.application.event.publisher.AccountEventPublisher;
 import com.banking.system.account.application.usecase.*;
 import com.banking.system.account.domain.exception.AccountAlreadyExistsException;
+import com.banking.system.account.domain.exception.AccountHasNonZeroBalanceException;
 import com.banking.system.account.domain.exception.AccountNotFoundException;
 import com.banking.system.account.domain.exception.AliasGenerationFailedException;
 import com.banking.system.account.domain.exception.InvalidAccountOwnerException;
 import com.banking.system.account.domain.model.Account;
-import com.banking.system.account.domain.model.AccountType;
+import com.banking.system.account.domain.model.enums.AccountType;
 import com.banking.system.account.domain.port.out.AccountAliasGenerator;
 import com.banking.system.account.domain.port.out.AccountNumberGenerator;
 import com.banking.system.account.domain.port.out.AccountRepositoryPort;
@@ -34,7 +35,8 @@ public class AccountService implements
         FindAccountByIdUseCase,
         FindAllAccountsByUserId,
         GetAccountBalanceUseCase,
-        SearchAccountByAliasUseCase {
+        SearchAccountByAliasUseCase,
+        CloseAllAccountsUseCase {
 
     private static final int MAX_ALIAS_GENERATION_ATTEMPTS = 5;
 
@@ -77,7 +79,7 @@ public class AccountService implements
                 savedAccount.getId(),
                 savedAccount.getAccountNumber(),
                 customer.getId());
-        
+
         accountEventPublisher.publishAccountCreated(
                 new AccountCreatedEvent(
                         savedAccount.getId(),
@@ -165,6 +167,30 @@ public class AccountService implements
                 account.getCurrency().code(),
                 account.getAccountType().name()
         );
+    }
+
+    @Transactional
+    public void closeAllAccountsForCustomer(UUID userId) {
+        var customer = customerRepositoryPort.findByUserId(userId)
+                .orElseThrow(() -> new InvalidAccountOwnerException("Customer not found for user ID " + userId));
+
+        var accounts = accountRepositoryPort.findAllByCustomerId(customer.getId());
+
+        for (Account account : accounts) {
+            if (account.isActive()) {
+                if (!account.getBalance().isZero()) {
+                    log.warn("Attempting to close account with non-zero balance: accountId={}, balance={}", account.getId(), account.getBalance().getValue());
+                    throw new AccountHasNonZeroBalanceException(
+                            "Cannot close account with non-zero balance. Account ID: " + account.getId());
+                }
+                account.close();
+                accountRepositoryPort.save(account);
+                log.info("Closed account: id={}, number={}, customer={}",
+                        account.getId(),
+                        account.getAccountNumber(),
+                        customer.getId());
+            }
+        }
     }
 
     /**

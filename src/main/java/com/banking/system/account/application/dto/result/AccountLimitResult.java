@@ -1,7 +1,7 @@
 package com.banking.system.account.application.dto.result;
 
 import com.banking.system.account.domain.model.Account;
-import com.banking.system.account.domain.model.AccountLimits;
+import com.banking.system.account.domain.model.value_object.AccountLimits;
 
 import java.math.BigDecimal;
 import java.util.UUID;

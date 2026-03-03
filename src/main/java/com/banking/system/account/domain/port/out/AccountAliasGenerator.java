@@ -1,6 +1,6 @@
 package com.banking.system.account.domain.port.out;
 
-import com.banking.system.account.domain.model.AccountAlias;
+import com.banking.system.account.domain.model.value_object.AccountAlias;
 
 /**
  * Port for generating random account aliases.

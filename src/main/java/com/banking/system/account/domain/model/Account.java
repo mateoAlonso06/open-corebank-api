@@ -3,10 +3,16 @@ package com.banking.system.account.domain.model;
 import com.banking.system.account.domain.exception.AccountNotActiveException;
 import com.banking.system.account.domain.exception.InsufficientFundsException;
 import com.banking.system.account.domain.exception.InvalidAmountException;
+import com.banking.system.account.domain.model.enums.AccountStatus;
+import com.banking.system.account.domain.model.enums.AccountType;
+import com.banking.system.account.domain.model.value_object.AccountAlias;
+import com.banking.system.account.domain.model.value_object.AccountLimits;
+import com.banking.system.account.domain.model.value_object.AccountNumber;
 import com.banking.system.common.domain.Money;
 import com.banking.system.common.domain.MoneyCurrency;
 import com.banking.system.common.domain.exception.CurrencyMismatchException;
 import lombok.Getter;
+import org.jspecify.annotations.NonNull;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -220,7 +226,13 @@ public class Account {
         return this.status == AccountStatus.ACTIVE;
     }
 
-    private void validateSameCurrency(MoneyCurrency currency) {
+    public void close() {
+        validateActiveAccount();
+        this.status = AccountStatus.CLOSED;
+        this.closedAt = LocalDate.now();
+    }
+
+    private void validateSameCurrency(@NonNull MoneyCurrency currency) {
         if (!this.currency.value().equals(currency.value())) {
             throw new CurrencyMismatchException("Account currency " + this.currency.value() + " does not match operation currency " + currency.value());
         }

@@ -1,4 +1,6 @@
-package com.banking.system.account.domain.model;
+package com.banking.system.account.domain.model.value_object;
+
+import com.banking.system.account.domain.model.enums.AccountType;
 
 import java.math.BigDecimal;
 

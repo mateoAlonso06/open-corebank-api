@@ -1,6 +1,9 @@
 package com.banking.system.transaction.domain.model;
 
 import com.banking.system.common.domain.Money;
+import com.banking.system.transaction.domain.model.enums.TransferCategory;
+import com.banking.system.transaction.domain.model.value_object.Description;
+import com.banking.system.transaction.domain.model.value_object.IdempotencyKey;
 import lombok.Getter;
 
 import java.time.Instant;
