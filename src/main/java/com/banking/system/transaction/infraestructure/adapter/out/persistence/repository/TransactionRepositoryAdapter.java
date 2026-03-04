@@ -109,6 +109,18 @@ public class TransactionRepositoryAdapter implements TransactionRepositoryPort {
     }
 
     @Override
+    public PagedResult<Transaction> findAllByAccountIdsAndType(List<UUID> accountIds, String typeTransfer, PageRequest pageRequest) {
+        var base = PageMapper.toPageable(pageRequest);
+        var pageable = org.springframework.data.domain.PageRequest.of(
+                base.getPageNumber(),
+                base.getPageSize(),
+                SORT_BY_EXECUTED_AT_DESC
+        );
+        var page = transactionJpaRepository.findAllByAccountIdAndTransactionType(accountIds, typeTransfer, pageable);
+        return PageMapper.toPagedResult(page, TransactionJpaEntityMapper::toDomainEntity);
+    }
+
+    @Override
     public BigDecimal sumCompletedAmountByAccountIdAndTypeSince(UUID accountId, TransactionType type, Instant since) {
         return transactionJpaRepository.sumCompletedAmountByAccountIdAndTypeSince(accountId, type, since);
     }

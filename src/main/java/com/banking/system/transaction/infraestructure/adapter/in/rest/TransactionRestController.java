@@ -2,6 +2,7 @@ package com.banking.system.transaction.infraestructure.adapter.in.rest;
 
 import com.banking.system.common.domain.PageRequest;
 import com.banking.system.common.domain.dto.PagedResult;
+import com.banking.system.transaction.application.dto.receipt.TransactionReceipt;
 import com.banking.system.transaction.application.dto.result.TransactionResult;
 import com.banking.system.transaction.application.usecase.*;
 import com.banking.system.transaction.infraestructure.adapter.in.rest.dto.request.DepositMoneyRequest;
@@ -53,16 +54,16 @@ public class TransactionRestController {
     })
     @PreAuthorize("hasAuthority('TRANSACTION_DEPOSIT')")
     @PostMapping("/accounts/{accountId}/deposits")
-    public ResponseEntity<Void> createDeposit(
+    public ResponseEntity<TransactionReceipt> createDeposit(
             @RequestBody @Valid DepositMoneyRequest request,
             @Parameter(description = "Target account ID", example = "550e8400-e29b-41d4-a716-446655440000")
             @PathVariable UUID accountId,
             @Parameter(hidden = true)
             @AuthenticationPrincipal UUID userId) {
         var command = request.toCommand();
-        depositUseCase.deposit(command, accountId, userId);
+        var result = depositUseCase.deposit(command, accountId, userId);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body(result);
     }
 
     @Operation(
@@ -78,9 +79,11 @@ public class TransactionRestController {
     })
     @PreAuthorize("hasAuthority('TRANSACTION_VIEW_OWN')")
     @GetMapping("/me")
-    public ResponseEntity<PagedResult<TransactionResult>> getAllTransactionsByCustomer(@AuthenticationPrincipal UUID userId, Pageable pageable) {
+    public ResponseEntity<PagedResult<TransactionResult>> getAllTransactionsByCustomer(@AuthenticationPrincipal UUID userId,
+                                                                                       @RequestParam(required = false) boolean typeTransfer,
+                                                                                       Pageable pageable) {
         var pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
-        var result = getAllTransactionsByCustomerUseCase.getAllTransactionsByCustomer(userId, pageRequest);
+        var result = getAllTransactionsByCustomerUseCase.getAllTransactionsByCustomer(userId, typeTransfer, pageRequest);
         return ResponseEntity.ok(result);
     }
 
@@ -98,16 +101,16 @@ public class TransactionRestController {
     })
     @PreAuthorize("hasAuthority('TRANSACTION_WITHDRAW')")
     @PostMapping("/accounts/{accountId}/withdrawals")
-    public ResponseEntity<Void> withdrawMoney(
+    public ResponseEntity<TransactionReceipt> withdrawMoney(
             @RequestBody @Valid WithdrawMoneyRequest request,
             @Parameter(description = "Source account ID", example = "550e8400-e29b-41d4-a716-446655440000")
             @PathVariable UUID accountId,
             @Parameter(hidden = true)
             @AuthenticationPrincipal UUID userId) {
         var command = request.toCommand();
-        withdrawUseCase.withdraw(command, accountId, userId);
+        var result = withdrawUseCase.withdraw(command, accountId, userId);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body(result);
     }
 
     @Operation(

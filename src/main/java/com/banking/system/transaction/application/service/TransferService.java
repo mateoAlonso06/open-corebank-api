@@ -110,6 +110,7 @@ public class TransferService implements TransferMoneyUseCase, GetTransferByIdUse
         boolean isOwnerOfSource = sourceAccount.getCustomerId().equals(customer.getId());
         boolean isOwnerOfDestination = destinationAccount.getCustomerId().equals(customer.getId());
 
+        // Only allow access if the authenticated user is the owner of either the source or destination account
         if (!isOwnerOfSource && !isOwnerOfDestination) {
             log.warn("Unauthorized transfer access attempt by userId: {} to transferId: {}", userId, transferId);
             throw new TransferAccessDeniedException("Transfer does not belong to the authenticated user");
@@ -118,6 +119,7 @@ public class TransferService implements TransferMoneyUseCase, GetTransferByIdUse
         return TransferDomainMapper.toResult(transfer);
     }
 
+    // for admin or authorized roles to view any transfer by ID without ownership check
     @Override
     @Transactional(readOnly = true)
     public TransferResult findById(UUID transferId) {

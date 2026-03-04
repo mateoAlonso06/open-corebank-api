@@ -6,6 +6,7 @@ import com.banking.system.transaction.application.dto.receipt.TransactionReceipt
 import com.banking.system.transaction.application.dto.receipt.TransferReceipt;
 import com.banking.system.transaction.domain.model.Transaction;
 import com.banking.system.transaction.domain.model.Transfer;
+import com.banking.system.transaction.domain.model.enums.TransactionStatus;
 
 /**
  * Mapper for creating receipts (vouchers/confirmations) from domain models.
@@ -27,7 +28,7 @@ public class ReceiptMapper {
                 maskAccountNumber(account.getAccountNumber().value()),
                 account.getAlias() != null ? account.getAlias().value() : null,
                 transaction.getDescription() != null ? transaction.getDescription().value() : null,
-                transaction.getStatus().name(),
+                TransactionStatus.COMPLETED.name(),
                 transaction.getExecutedAt()
         );
     }

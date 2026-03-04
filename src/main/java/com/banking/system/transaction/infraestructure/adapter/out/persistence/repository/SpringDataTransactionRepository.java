@@ -4,6 +4,7 @@ import com.banking.system.transaction.domain.model.enums.TransactionStatus;
 import com.banking.system.transaction.domain.model.enums.TransactionType;
 import com.banking.system.transaction.infraestructure.adapter.out.persistence.entity.TransactionJpaEntity;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -35,4 +36,14 @@ public interface SpringDataTransactionRepository extends JpaRepository<Transacti
             @Param("since") Instant since);
 
     Optional<TransactionJpaEntity> findByReferenceNumber(String referenceNumber);
+
+    @Query("""
+            SELECT t FROM TransactionJpaEntity t
+            WHERE t.accountId IN :accountIds
+            AND CAST(t.transactionType AS STRING) LIKE CONCAT(:typePrefix, '%')
+            AND t.status = 'COMPLETED'
+            """)
+    Page<TransactionJpaEntity> findAllByAccountIdAndTransactionType(@Param("accountIds") List<UUID> accountIds,
+                                                                    @Param("typePrefix") String typePrefix,
+                                                                    Pageable pageable);
 }

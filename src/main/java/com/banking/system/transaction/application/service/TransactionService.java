@@ -1,7 +1,6 @@
 package com.banking.system.transaction.application.service;
 
 import com.banking.system.account.application.dto.result.AccountLimitResult;
-import com.banking.system.account.domain.exception.AccountNotActiveException;
 import com.banking.system.account.domain.exception.AccountNotFoundException;
 import com.banking.system.account.domain.model.Account;
 import com.banking.system.account.domain.model.value_object.AccountLimits;
@@ -27,7 +26,7 @@ import com.banking.system.transaction.domain.exception.MonthlyLimitExceededExcep
 import com.banking.system.transaction.domain.exception.alreadyexist.TransactionAlreadyExistException;
 import com.banking.system.transaction.domain.exception.denied.AccountAccessDeniedException;
 import com.banking.system.transaction.domain.exception.notfound.TransactionNotFoundException;
-import com.banking.system.transaction.domain.model.*;
+import com.banking.system.transaction.domain.model.Transaction;
 import com.banking.system.transaction.domain.model.enums.TransactionStatus;
 import com.banking.system.transaction.domain.model.enums.TransactionType;
 import com.banking.system.transaction.domain.model.value_object.Description;
@@ -182,10 +181,9 @@ public class TransactionService implements
         return PagedResult.mapContent(transactionsPage, TransactionDomainMapper::toResult);
     }
 
-
     @Override
     @Transactional(readOnly = true)
-    public PagedResult<TransactionResult> getAllTransactionsByCustomer(UUID userId, PageRequest pageRequest) {
+    public PagedResult<TransactionResult> getAllTransactionsByCustomer(UUID userId, boolean typeTransfer, PageRequest pageRequest) {
         var customer = customerRepositoryPort.findByUserId(userId)
                 .orElseThrow(() -> new CustomerNotFoundException("Customer not found for userId: " + userId));
 
@@ -199,8 +197,14 @@ public class TransactionService implements
                 .map(Account::getId)
                 .toList();
 
-        PagedResult<Transaction> transactions = transactionRepositoryPort
-                .findAllByAccountIdsAndStatus(accountIds, TransactionStatus.COMPLETED, pageRequest);
+        PagedResult<Transaction> transactions = PagedResult.of(List.of(), 0, 0, 0);
+        if (typeTransfer) {
+            transactions = transactionRepositoryPort
+                    .findAllByAccountIdsAndType(accountIds, "TRANSFER", pageRequest);
+        } else {
+            transactions = transactionRepositoryPort
+                    .findAllByAccountIdsAndStatus(accountIds, TransactionStatus.COMPLETED, pageRequest);
+        }
 
         return PagedResult.mapContent(transactions, TransactionDomainMapper::toResult);
     }

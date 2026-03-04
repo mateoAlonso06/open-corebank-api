@@ -27,5 +27,7 @@ public interface TransactionRepositoryPort {
 
     PagedResult<Transaction> findAllByAccountIdsAndStatus(List<UUID> accountIds, TransactionStatus status, PageRequest pageRequest);
 
+    PagedResult<Transaction> findAllByAccountIdsAndType(List<UUID> accountIds, String typeTransfer, PageRequest pageRequest);
+
     BigDecimal sumCompletedAmountByAccountIdAndTypeSince(UUID accountId, TransactionType type, Instant since);
 }
