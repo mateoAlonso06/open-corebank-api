@@ -25,12 +25,18 @@ spring:
     port: ${MAIL_PORT:2525}
     username: ${MAIL_USERNAME:}
     password: ${MAIL_PASSWORD:}
+    from-address: ${MAIL_FROM_ADDRESS:no-reply@localhost}
+    from-name: ${MAIL_FROM_NAME:Core Bank}
     properties:
       mail:
         smtp:
           auth: true
           starttls:
             enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
   output:
     ansi:
       enabled: ALWAYS
