@@ -51,7 +51,8 @@ public class AccountEmailEventListener {
                                 "currency", event.currency(),
                                 "accountType", event.accountType(),
                                 "openedAt", event.openedAt(),
-                                "balance", "0.00"
+                                "balance", "0.00",
+                                "loginUrl", "https://app.open-corebank.xyz/accounts"
                         ),
                         NotificationType.ACCOUNT_CREATED
                 )
