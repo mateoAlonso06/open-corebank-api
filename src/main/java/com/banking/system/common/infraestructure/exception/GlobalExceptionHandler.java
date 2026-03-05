@@ -11,14 +11,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.Instant;
 import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -41,7 +40,6 @@ public class GlobalExceptionHandler {
     private static final String MSG_ACCESS_DENIED = "You do not have permission to perform this action";
     private static final String MSG_BUSINESS_RULE = "The operation violates business rules";
     private static final String MSG_VALIDATION_FAILED = "The request contains invalid data";
-    private static final String MSG_INVALID_ARGUMENT = "Invalid request parameters";
     private static final String MSG_INVALID_STATE = "Operation not allowed in current state";
     private static final String MSG_INTERNAL_ERROR = "An unexpected error occurred. Please contact support with the correlation ID";
     private static final String MSG_ACCOUNT_LOCKED = "Account is temporarily locked";
@@ -197,35 +195,22 @@ public class GlobalExceptionHandler {
     /**
      * Handles @Valid validation errors from request bodies.
      * Logs: Detailed field errors for debugging
-     * Response: In production, only show which fields failed without internal details
+     * Response: Structured fieldErrors map (field → constraint code, e.g. "NotBlank", "Size")
+     * so clients can map each field to a specific error without parsing strings.
+     * Field names are never sensitive — exposed in both dev and production.
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException ex) {
-        // Build detailed error list for logging
-        List<String> detailedErrors = ex.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .map(error -> error.getField() + ": " + error.getDefaultMessage())
-                .toList();
+        Map<String, String> fieldErrors = new LinkedHashMap<>();
+        ex.getBindingResult().getFieldErrors()
+                .forEach(error -> fieldErrors.putIfAbsent(error.getField(), error.getCode()));
 
         log.warn("Validation failed [correlationId={}]: {}",
-                MDC.get("correlationId"), detailedErrors);
+                MDC.get("correlationId"), fieldErrors);
 
-        if (isProduction()) {
-            // In production: only show field names without detailed messages
-            List<String> fieldNames = ex.getBindingResult()
-                    .getFieldErrors()
-                    .stream()
-                    .map(FieldError::getField)
-                    .distinct()
-                    .toList();
-            String message = MSG_VALIDATION_FAILED + ": " + String.join(", ", fieldNames);
-            return buildResponse(HttpStatus.BAD_REQUEST, "Bad Request", message, "VALIDATION_FAILED");
-        }
-
-        // In dev: show full details for easier debugging
-        String message = String.join("; ", detailedErrors);
-        return buildResponse(HttpStatus.BAD_REQUEST, "Bad Request", message, "VALIDATION_FAILED");
+        Map<String, Object> body = buildBody(HttpStatus.BAD_REQUEST, "Bad Request", MSG_VALIDATION_FAILED, "VALIDATION_FAILED");
+        body.put("fieldErrors", fieldErrors);
+        return ResponseEntity.badRequest().body(body);
     }
 
     /**
@@ -241,17 +226,17 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Handles illegal argument exceptions.
-     * Logs: Full details for debugging
-     * Response: Generic message in production to hide validation logic
+     * Handles illegal argument exceptions thrown by domain value objects
+     * (e.g. "Phone number cannot be blank", "Email cannot be blank").
+     * These messages are safe to expose — they describe input validation rules,
+     * not internal system details — so they are always returned to the client.
      */
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> handleIllegalArgument(IllegalArgumentException ex) {
         log.warn("Invalid argument [correlationId={}]: {}",
                 MDC.get("correlationId"), ex.getMessage());
 
-        String message = sanitizeMessage(ex.getMessage(), MSG_INVALID_ARGUMENT);
-        return buildResponse(HttpStatus.BAD_REQUEST, "Bad Request", message, "INVALID_ARGUMENT");
+        return buildResponse(HttpStatus.BAD_REQUEST, "Bad Request", ex.getMessage(), "INVALID_ARGUMENT");
     }
 
     /**
@@ -335,13 +320,13 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Builds a standardized error response with correlation ID for tracking.
+     * Builds a standardized error response body with correlation ID for tracking.
      * The correlation ID allows:
      * - Users to reference specific errors when contacting support
      * - Developers to find the exact request in logs
      * - Security team to trace suspicious activity
      */
-    private ResponseEntity<Map<String, Object>> buildResponse(
+    private Map<String, Object> buildBody(
             HttpStatus status, String error, String message, String errorCode) {
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", Instant.now().toString());
@@ -358,6 +343,11 @@ public class GlobalExceptionHandler {
             body.put("correlationId", correlationId);
         }
 
-        return ResponseEntity.status(status).body(body);
+        return body;
+    }
+
+    private ResponseEntity<Map<String, Object>> buildResponse(
+            HttpStatus status, String error, String message, String errorCode) {
+        return ResponseEntity.status(status).body(buildBody(status, error, message, errorCode));
     }
 }
