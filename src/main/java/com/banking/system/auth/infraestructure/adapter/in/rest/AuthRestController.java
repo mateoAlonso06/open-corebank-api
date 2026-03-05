@@ -1,11 +1,14 @@
 package com.banking.system.auth.infraestructure.adapter.in.rest;
 
+import com.banking.system.auth.application.dto.command.ForgotPasswordCommand;
 import com.banking.system.auth.application.dto.command.ResendVerificationCommand;
 import com.banking.system.auth.application.dto.command.VerifyEmailCommand;
 import com.banking.system.auth.application.dto.result.LoginResult;
 import com.banking.system.auth.application.dto.result.RegisterResult;
 import com.banking.system.auth.application.dto.result.TwoFactorStatusResult;
 import com.banking.system.auth.application.usecase.*;
+import com.banking.system.auth.application.usecase.ForgotPasswordUseCase;
+import com.banking.system.auth.application.usecase.ResetPasswordUseCase;
 import com.banking.system.auth.infraestructure.adapter.in.rest.dto.request.*;
 import com.banking.system.auth.infraestructure.adapter.in.rest.dto.response.TwoFactorStatusResponse;
 import com.banking.system.auth.infraestructure.config.CookieHelper;
@@ -45,6 +48,8 @@ public class AuthRestController {
     private final RefreshTokenUseCase refreshTokenUseCase;
     private final LogoutUseCase logoutUseCase;
     private final DeactivateAccountUseCase deactivateAccountUseCase;
+    private final ForgotPasswordUseCase forgotPasswordUseCase;
+    private final ResetPasswordUseCase resetPasswordUseCase;
     private final CookieHelper cookieHelper;
 
     @Operation(
@@ -260,6 +265,36 @@ public class AuthRestController {
                 .header(HttpHeaders.SET_COOKIE, cookieHelper.clearRefreshTokenCookie().toString())
                 .header(HttpHeaders.SET_COOKIE, cookieHelper.clearCsrfTokenCookie().toString())
                 .build();
+    }
+
+    @Operation(
+            summary = "Forgot password",
+            description = "Sends a password reset token to the user's email address if it exists. " +
+                    "Always responds with 200 to avoid user enumeration."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "If the email exists, a reset token has been sent"),
+            @ApiResponse(responseCode = "400", description = "Invalid request data (validation failed)")
+    })
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Void> forgotPassword(@RequestBody @Valid ForgotPasswordRequest request) {
+        forgotPasswordUseCase.forgotPassword(new ForgotPasswordCommand(request.email()));
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "Reset password",
+            description = "Resets the user's password using a valid reset token received by email."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Password reset successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request data (validation failed)"),
+            @ApiResponse(responseCode = "422", description = "Invalid, expired, or already used reset token")
+    })
+    @PostMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(@RequestBody @Valid ResetPasswordRequest request) {
+        resetPasswordUseCase.resetPassword(request.toCommand());
+        return ResponseEntity.noContent().build();
     }
 
     private ResponseEntity<LoginResult> buildResponseWithCookies(LoginResult result) {

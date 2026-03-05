@@ -3,6 +3,7 @@ package com.banking.system.auth.application.event.publisher;
 import com.banking.system.auth.application.dto.command.RegisterCommand;
 import com.banking.system.auth.application.event.CloseAllAccountsEvent;
 import com.banking.system.auth.application.event.EmailVerificationRequestedEvent;
+import com.banking.system.auth.application.event.PasswordResetRequestedEvent;
 import com.banking.system.auth.application.event.TwoFactorCodeRequestedEvent;
 import com.banking.system.auth.application.event.UserRegisteredEvent;
 import com.banking.system.auth.domain.model.User;
@@ -54,6 +55,13 @@ public class SpringUserEventPublisher implements UserEventPublisher {
     public void publishCloseAllAccountsRequestEvent(UUID userId) {
         applicationEventPublisher.publishEvent(
                 new CloseAllAccountsEvent(userId)
+        );
+    }
+
+    @Override
+    public void publishPasswordResetRequestedEvent(UUID userId, String email, String token) {
+        applicationEventPublisher.publishEvent(
+                new PasswordResetRequestedEvent(userId, email, token)
         );
     }
 }

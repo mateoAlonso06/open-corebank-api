@@ -14,4 +14,6 @@ public interface UserEventPublisher {
     void publishTwoFactorCodeRequestedEvent(UUID userId, String email, String code, String firstName);
 
     void publishCloseAllAccountsRequestEvent(UUID userId);
+
+    void publishPasswordResetRequestedEvent(UUID userId, String email, String token);
 }
