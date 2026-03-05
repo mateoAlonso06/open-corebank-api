@@ -84,14 +84,17 @@ management:
     sampling:
       probability: 0.1               # 10% sampling in prod (reduce overhead)
 
-# Swagger UI disabled in production - security best practice
+# Swagger UI enabled for API showcase
 springdoc:
   api-docs:
-    enabled: false
+    enabled: true
   swagger-ui:
-    enabled: false
+    enabled: true
 
-# Strict CSP for production REST API
+# Permissive CSP required for Swagger UI (loads inline scripts/styles)
 security:
   csp:
-    policy: "default-src 'none'; frame-ancestors 'none';"
+    policy: "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; frame-ancestors 'none';"
+
+cookie:
+  domain: open-corebank.xyz

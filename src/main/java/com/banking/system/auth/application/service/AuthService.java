@@ -70,7 +70,7 @@ public class AuthService implements
     @Transactional
     public LoginResult login(LoginCommand command) {
         User user = userRepository.findByEmail(command.email())
-                .orElseThrow(() -> new UserNotFoundException("Invalid credentials"));
+                .orElseThrow(() -> new InvalidCredentialsException("Invalid credentials"));
 
         // for security verify password is the first check
         if (!passwordHasher.verify(command.password(), user.getPassword().value()))

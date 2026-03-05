@@ -24,6 +24,9 @@ public class CookieHelper {
     @Value("${cookie.secure:true}")
     private boolean secure;
 
+    @Value("${cookie.domain:}")
+    private String domain;
+
     public ResponseCookie createRefreshTokenCookie(String token) {
         return ResponseCookie.from(REFRESH_TOKEN_COOKIE, token)
                 .httpOnly(true)
@@ -49,23 +52,31 @@ public class CookieHelper {
         secureRandom.nextBytes(bytes);
         String csrfToken = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
 
-        return ResponseCookie.from(CSRF_TOKEN_COOKIE, csrfToken)
+        ResponseCookie.ResponseCookieBuilder builder = ResponseCookie.from(CSRF_TOKEN_COOKIE, csrfToken)
                 .httpOnly(false)
                 .secure(secure)
                 .path("/")
                 .maxAge(MAX_AGE_SECONDS)
-                .sameSite("Lax")
-                .build();
+                .sameSite("Lax");
+
+        if (!domain.isBlank()) {
+            builder.domain(domain);
+        }
+        return builder.build();
     }
 
     public ResponseCookie clearCsrfTokenCookie() {
-        return ResponseCookie.from(CSRF_TOKEN_COOKIE, "")
+        ResponseCookie.ResponseCookieBuilder builder = ResponseCookie.from(CSRF_TOKEN_COOKIE, "")
                 .httpOnly(false)
                 .secure(secure)
                 .path("/")
                 .maxAge(0)
-                .sameSite("Lax")
-                .build();
+                .sameSite("Lax");
+
+        if (!domain.isBlank()) {
+            builder.domain(domain);
+        }
+        return builder.build();
     }
 
     public Optional<String> extractRefreshToken(HttpServletRequest request) {

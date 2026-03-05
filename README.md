@@ -106,65 +106,21 @@ Audit trail infrastructure (database table in place, module scaffolded).
 
 ## API Endpoints
 
+Full interactive documentation is available via Swagger UI:
+
+- **Production:** [https://open-corebank.xyz/swagger-ui/index.html](https://open-corebank.xyz/swagger-ui/index.html)
+- **Local:** `http://localhost:8080/swagger-ui/index.html` (requires `dev` profile)
+
 All paths are prefixed with `/api/v1`.
 
-### Authentication — `/api/v1/auth`
-
-| Method | Path | Description | Auth |
-|---|---|---|---|
-| POST | `/auth/register` | Register a new user | Public |
-| POST | `/auth/login` | Authenticate and receive JWT (or 2FA session token) | Public |
-| POST | `/auth/refresh` | Issue new access token via refresh token cookie | Public |
-| POST | `/auth/logout` | Revoke refresh token and end session | Public |
-| POST | `/auth/verify-email` | Verify email with token | Public |
-| POST | `/auth/resend-verification` | Resend verification email | Public |
-| PUT | `/auth/change-password` | Change password | Authenticated |
-| POST | `/auth/2fa/verify` | Verify 2FA code and receive JWT | Public |
-| PUT | `/auth/2fa/toggle` | Enable or disable 2FA | Authenticated |
-| GET | `/auth/2fa/status` | Get current 2FA status | Authenticated |
-
-### Customers — `/api/v1/customers` (authenticated)
-
-| Method | Path | Permission |
-|---|---|---|
-| GET | `/customers/me` | `CUSTOMER_VIEW_OWN` |
-| PUT | `/customers/me` | `CUSTOMER_UPDATE` |
-| GET | `/customers/{id}` | `CUSTOMER_VIEW` |
-| GET | `/customers` | `CUSTOMER_VIEW_ALL` |
-| PUT | `/customers/{id}/kyc/approve` | `KYC_APPROVE` |
-| PUT | `/customers/{id}/kyc/reject` | `KYC_REJECT` |
-
-### Accounts — `/api/v1/accounts` (authenticated)
-
-| Method | Path | Permission |
-|---|---|---|
-| POST | `/accounts` | `ACCOUNT_CREATE` |
-| GET | `/accounts/me` | `ACCOUNT_VIEW_OWN` |
-| GET | `/accounts/me/{id}` | `ACCOUNT_VIEW_OWN` |
-| GET | `/accounts/{id}` | `ACCOUNT_VIEW_ALL` |
-| GET | `/accounts/me/{id}/balance` | `ACCOUNT_VIEW_OWN` |
-| GET | `/accounts/search?alias=...` | `ACCOUNT_VIEW_OWN` |
-| GET | `/accounts/types` | Authenticated |
-
-### Transactions — `/api/v1/transactions` (authenticated)
-
-| Method | Path | Permission |
-|---|---|---|
-| POST | `/transactions/accounts/{id}/deposits` | `TRANSACTION_DEPOSIT` |
-| POST | `/transactions/accounts/{id}/withdrawals` | `TRANSACTION_WITHDRAW` |
-| GET | `/transactions/me` | `TRANSACTION_VIEW_OWN` |
-| GET | `/transactions/accounts/{id}` | `TRANSACTION_VIEW_OWN` |
-| GET | `/transactions/{id}` | `TRANSACTION_VIEW_OWN` |
-
-### Transfers — `/api/v1/transfers` (authenticated)
-
-| Method | Path | Permission |
-|---|---|---|
-| POST | `/transfers` | `TRANSACTION_TRANSFER` |
-| GET | `/transfers/{id}/me` | `TRANSACTION_VIEW_OWN` |
-| GET | `/transfers/{id}` | `TRANSACTION_VIEW_ALL` |
-
-Swagger UI available at `/swagger-ui.html` when running locally with the `dev` profile.
+| Module | Endpoints |
+|---|---|
+| **Auth** | Register, login, logout, token refresh, email verification, password change, forgot/reset password, 2FA toggle and verification |
+| **Customers** | View and update own profile, admin CRUD, KYC approve/reject |
+| **Accounts** | Create, view, close, balance inquiry, search by alias |
+| **Transactions** | Deposits, withdrawals, transaction history |
+| **Transfers** | Transfer between accounts (by account number or alias), transfer history |
+| **Admin / Users** | Block and unblock user accounts |
 
 ## Observability
 
@@ -262,8 +218,11 @@ Migrations are managed by Flyway and run automatically on startup. Files are loc
 
 | Migration | Description |
 |---|---|
-| V1 | Consolidated initial schema (users, roles, permissions, customers, accounts, transactions, transfers, audit_logs, email_verification_tokens) |
-| V2 | Seed initial data (default roles: CUSTOMER, ADMIN, BRANCH_MANAGER and their associated permissions) |
+| V1 | Initial schema — users, roles, permissions, customers, accounts, transactions, transfers, audit_logs, email_verification_tokens |
+| V2 | Seed data — default roles (CUSTOMER, ADMIN, BRANCH_MANAGER) with their associated permissions |
+| V3 | Two-factor authentication — `two_factor_enabled` column on users, `two_factor_codes` table |
+| V4 | Optimistic locking — `version` column on accounts to prevent concurrent modification race conditions |
+| V5 | Password reset — `password_reset_tokens` table |
 
 ## Testing
 

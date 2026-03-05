@@ -42,7 +42,8 @@ CLAUDE.md
 ### IntelliJ Run Configurations ###
 .run/
 
-
 # MD for prod
 INTEGRATION_TESTS_CHECKLIST.md
 PRODUCTION_READINESS.md
+
+docker-compose-prod.yml

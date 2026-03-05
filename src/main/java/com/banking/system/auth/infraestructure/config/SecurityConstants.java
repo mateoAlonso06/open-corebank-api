@@ -9,6 +9,9 @@ public class SecurityConstants {
             "/api/v1/auth/2fa/verify",
             "/api/v1/auth/refresh",
             "/api/v1/auth/logout",
+            "/api/v1/auth/forgot-password",
+            "/api/v1/auth/reset-password",
+            "/error",
             "/swagger-ui/**",
             "/v3/api-docs/**"
     };
