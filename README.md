@@ -106,9 +106,10 @@ Audit trail infrastructure (database table in place, module scaffolded).
 
 ## API Endpoints
 
-Full interactive documentation is available via Swagger UI:
+Full interactive documentation is available via React App & Swagger UI:
 
-- **Production:** [https://open-corebank.xyz/swagger-ui/index.html](https://open-corebank.xyz/swagger-ui/index.html)
+- **Production:** [app.open-corebank.xyz](https://open-corebank.xyz)
+- **Swagger:** [https://open-corebank.xyz/swagger-ui/index.html](https://open-corebank.xyz/swagger-ui/index.html)
 - **Local:** `http://localhost:8080/swagger-ui/index.html` (requires `dev` profile)
 
 All paths are prefixed with `/api/v1`.
