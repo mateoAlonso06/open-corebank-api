@@ -17,7 +17,7 @@ A backend core banking system built with **Java 21** and **Spring Boot 3.5**, fo
 
 ## Tech Stack
 
-| Category | Technology |
+| Category | Technology |Production
 |---|---|
 | Language | Java 21 |
 | Framework | Spring Boot 3.5.9 |
@@ -108,7 +108,7 @@ Audit trail infrastructure (database table in place, module scaffolded).
 
 Full interactive documentation is available via React App & Swagger UI:
 
-- **Production:** [app.open-corebank.xyz](https://open-corebank.xyz)
+- **Production:** [app.open-corebank.xyz](https://app.open-corebank.xyz)
 - **Swagger:** [https://open-corebank.xyz/swagger-ui/index.html](https://open-corebank.xyz/swagger-ui/index.html)
 - **Local:** `http://localhost:8080/swagger-ui/index.html` (requires `dev` profile)
 
