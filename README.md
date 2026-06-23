@@ -306,7 +306,3 @@ core-banking-system/
 ├── Dockerfile                     # Multi-stage build (JDK 21 → JRE 21)
 └── pom.xml
 ```
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
